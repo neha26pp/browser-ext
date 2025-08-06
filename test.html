@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TechCorp - Premium electronics and technology products">
+    <title>TechCorp - Electronics & Technology Store</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #fafafa;
+        }
+        
+        .card h3 {
+            margin-top: 0;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+        
+        /* Image styling */
+        .product-image {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+        }
+        
+        .chart-image {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        /* Form styling */
+        .form-container {
+            max-width: 400px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .good-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #059669;
+            margin: 0.5rem 0;
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .rating {
+            color: #fbbf24;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .link-examples {
+            margin: 1rem 0;
+        }
+        
+        .link-examples a {
+            color: #2563eb;
+            text-decoration: underline;
+            margin-right: 1rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-bar {
+            background: #374151;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .nav-bar a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>TechCorp Electronics</h1>
+        <p>Premium technology products and customer support</p>
+    </header>
+
+    <!-- Featured Products Section -->
+    <section class="section">
+        <h2>🛒 Featured Products</h2>
+        
+        <div class="grid">
+            <!-- Product 1 -->
+            <div class="card">
+                <h3>Premium Wireless Headphones</h3>
+                <div class="image-container">
+                    <img src="https://picsum.photos/300/200?random=1" class="product-image">
+                    <div class="price">$299.99</div>
+                    <div class="rating">★★★★★ 4.8/5 (324 reviews)</div>
+                    <p>Professional-grade wireless headphones with active noise cancellation, 30-hour battery life, and premium sound quality. Perfect for music production and everyday listening.</p>
+                </div>
+            </div>
+
+            <!-- Business Analytics -->
+            <div class="card">
+                <h3>Q4 Sales Performance</h3>
+                <div class="image-container">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzI1NjNlYiIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiPgogICAgU0FMRVMgQ0hBUlQKICA8L3RleHQ+CiAgPHJlY3QgeD0iNDAiIHk9IjcwIiB3aWR0aD0iMzAiIGhlaWdodD0iNDAiIGZpbGw9IndoaXRlIi8+CiAgPHJlY3QgeD0iOTAiIHk9IjYwIiB3aWR0aD0iMzAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+CiAgPHJlY3QgeD0iMTQwIiB5PSI1MCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjYwIiBmaWxsPSJ3aGl0ZSIvPgogIDxyZWN0IHg9IjE5MCIgeT0iMzAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI4MCIgZmlsbD0id2hpdGUiLz4KICA8dGV4dCB4PSI1NSIgeT0iMTMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxMiI+UTE8L3RleHQ+CiAgPHRleHQgeD0iMTA1IiB5PSIxMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjEyIj5RMjwvdGV4dD4KICA8dGV4dCB4PSIxNTUiIHk9IjEzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTIiPlEzPC90ZXh0PgogIDx0ZXh0IHg9IjIwNSIgeT0iMTMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxMiI+UTQ8L3RleHQ+CiAgPHRleHQgeD0iMTUwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+MjMlIEdyb3d0aDwvdGV4dD4KPC9zdmc+" 
+                         alt="chart" 
+                         class="chart-image">
+                    <p>Our quarterly sales performance shows exceptional growth this year, with Q4 representing our strongest quarter yet. Revenue increased 23% year-over-year across all product categories.</p>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="card">
+                <h3>Developer Laptop Pro</h3>
+                <div class="image-container">
+                    <img src="https://picsum.photos/300/200?random=2" 
+                         alt="Professional laptop computer open on wooden desk showing code editor with multiple programming windows" 
+                         class="product-image">
+                    <div class="price">$1,499.00</div>
+                    <div class="rating">★★★★★ 4.9/5 (156 reviews)</div>
+                    <p>High-performance laptop designed for developers and creative professionals. Features the latest processor, 32GB RAM, and a stunning 4K display.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Forms Section -->
+    <section class="section">
+        <h2>📞 Customer Support</h2>
+        
+        <div class="grid">
+            <!-- Contact Form -->
+            <div class="card">
+                <h3>Contact Our Support Team</h3>
+                <p>Having trouble with your order or need technical assistance? Our support team is here to help.</p>
+                <form class="form-container">
+                    <div class="form-group">
+                        <input type="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <select required>
+                            <option value="">Choose an option...</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="returns">Returns & Exchanges</option>
+                            <option value="general">General Inquiry</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <textarea rows="4" placeholder="Describe your issue or question..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+                
+                <!-- Support links with 2 truly vague examples -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <p>We offer multiple ways to get assistance. <a href="/support/live-chat">Click here</a>. You can also access our comprehensive help resources. <a href="/support/documentation">Read more</a>.</p>
+                </div>
+            </div>
+
+            <!-- Newsletter Signup -->
+            <div class="card">
+                <h3>Stay Updated</h3>
+                <p>Get the latest product announcements, exclusive deals, and tech news delivered to your inbox.</p>
+                <form class="form-container">
+                    <div class="form-group">
+                        <label for="firstName" class="good-label">First Name *</label>
+                        <input type="text" id="firstName" required aria-describedby="nameHelp">
+                        <div id="nameHelp" style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">
+                            Enter your first name as you'd like to be addressed in emails
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="good-label">Email Address *</label>
+                        <input type="email" id="email" placeholder="john@example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="interests" class="good-label">Product Interests</label>
+                        <select id="interests">
+                            <option value="">Select your interests (optional)</option>
+                            <option value="laptops">Laptops & Computers</option>
+                            <option value="audio">Audio Equipment</option>
+                            <option value="mobile">Mobile Devices</option>
+                            <option value="gaming">Gaming Gear</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn">Subscribe to Newsletter</button>
+                </form>
+                
+                <!-- Newsletter section without extra links -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <p>Questions about our newsletter? Contact our support team for assistance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Links Section -->
+    <section class="section">
+        <h2>🔗 Quick Navigation</h2>
+        <p>Explore different sections of our website and resources:</p>
+        
+        <!-- Simple paragraph with remaining text -->
+        <div style="margin-top: 2rem; padding: 1.5rem; background: #f1f5f9; border-radius: 8px;">
+            <h3>Important Information</h3>
+            <p>Before making a purchase, please review our terms of service and privacy policy. If you need assistance, contact our support team for help.</p>
+        </div>
+    </section>
+
+    <!-- Company Information -->
+    <section class="section">
+        <h2>🏢 About TechCorp</h2>
+        <p>TechCorp has been a leading provider of premium electronics and technology solutions for over 15 years. We pride ourselves on offering cutting-edge products, exceptional customer service, and competitive pricing.</p>
+        
+        <p>Our product lineup includes laptops, audio equipment, mobile devices, and gaming accessories from top brands. Whether you're a professional developer, creative artist, or tech enthusiast, we have the tools you need to succeed.</p>
+        
+        <blockquote style="border-left: 4px solid #2563eb; padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: #6b7280;">
+            "Quality products, exceptional service, and customer satisfaction are at the heart of everything we do."
+        </blockquote>
+        
+        <p>Visit our showroom or shop online to discover the latest in technology innovation. Our expert staff is always ready to help you find the perfect solution for your needs.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #1f2937; color: white; padding: 1.5rem; margin: 2rem -20px -20px -20px; text-align: center; border-radius: 0;">
+        <p>&copy; 2024 TechCorp Electronics. Quality technology solutions since 2009.</p>
+        <p>Contact: support@techcorp.com | 1-800-TECH-CORP | Mon-Fri 9AM-6PM EST</p>
+    </footer>
+</body>
+</html>
