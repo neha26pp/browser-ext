@@ -105,5 +105,4 @@ response_format: {
 }
 ```
 
-## 📄 **License**
-This project is licensed under the MIT License - see the LICENSE file for details.
+*Built with Gemma 3n for the Google Gemma 3n Impact Challenge 2025*
