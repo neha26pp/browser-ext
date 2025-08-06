@@ -43,10 +43,10 @@ async function highlightFormFields() {
     input.style.outline = "3px solid orange";
     input.classList.add('ai-form-highlight');
     
-    const loadingDiv = createLoadingIndicator(input, '🏷️ Generating label/placeholder...');
+    const loadingDiv = createLoadingIndicator(input, '🏷️ Generating label...');
     
     try {
-      const result = await generateFormFieldHelp(input);
+      const result = await generateFormFieldLabel(input);
       
       // Apply the generated help text
       if (result.label && !hasVisibleLabel(input)) {
@@ -110,17 +110,6 @@ async function analyzeAllFormFields() {
     try {
       const analysis = await analyzeFormFieldAccessibility(input);
       displayFormAccessibilityAnalysis(input, analysis);
-      
-      if (analysis.accessibility_score >= 8) {
-        input.style.outline = "3px solid darkgreen";
-        updateLoadingIndicator(loadingDiv, '✅ Form field is accessible', 'rgba(0,100,0,0.8)');
-      } else if (analysis.accessibility_score >= 5) {
-        input.style.outline = "3px solid orange";
-        updateLoadingIndicator(loadingDiv, '⚠️ Form accessibility needs improvement', 'rgba(255,165,0,0.8)');
-      } else {
-        input.style.outline = "3px solid red";
-        updateLoadingIndicator(loadingDiv, '❌ Poor form accessibility', 'rgba(128,0,0,0.8)');
-      }
       
       setTimeout(() => {
         loadingDiv.remove();
@@ -208,19 +197,14 @@ function isGenericPlaceholder(text) {
   return generic.some(g => text.toLowerCase().includes(g));
 }
 
-async function generateFormFieldHelp(inputElement) {
+async function generateFormFieldLabel(inputElement) {
   try {
     // Capture the input field and its context
     const inputImageData = await captureInputField(inputElement);
     const contextImageData = await captureInputWithContext(inputElement);
     
-    // const pageContext = getPageContext(inputElement);
-    // const formContext = getFormContext(inputElement);
     let inputContext = getInputContext(inputElement);
 
-    // console.log('Form context:', formContext);
-    // console.log('Input context:', inputContext);
-    
     // Add dropdown options to context if this is a select element
     let dropdownOptions = '';
     if (inputElement.tagName === 'SELECT') {
@@ -233,31 +217,42 @@ async function generateFormFieldHelp(inputElement) {
       if (optionTexts.length > 0) {
         dropdownOptions = `\nHere are the select options: ${optionTexts.join(', ')}`;
         inputContext = `\nHere is the input field context: ${inputContext}\nHere are the select options: ${optionTexts.join(', ')}`;
-        console.log('Adding dropdown options to context:', dropdownOptions);
       }
     }
     
-    const prompt = `You are a web accessibility expert tasked with generating helpful labels, placeholders, and help text for form inputs.
+    const prompt = `You are a web accessibility expert tasked with generating clear, concise, and descriptive labels for form inputs.
 
 # You will receive:
 - Input field screenshot (isolated)
 - Input field with surrounding context screenshot
 
-# Your task is to generate a helpful text label and aria-label for the form field.
+# Why labels matter::
+- Labels provide a programmatically associated, visible description of what information a form input expects.
+- They help all users, especially screen reader users, understand and navigate forms efficiently.
+- Unlike placeholders, labels remain visible when users enter data, reducing confusion and errors.
+- Proper labels improve usability and accessibility by linking text and input elements clearly.
 
 # Steps:
-1. Analyze the form context to understand what data the form is collecting
-2. Analyze the input's position and surrounding elements to understand its specific purpose
-3. Determine the input type and what kind of data it expects
-4. Generate a helpful text label and aria-label for the form field.
+1. Analyze the form context and surrounding UI to understand the input’s specific purpose.
+2. Identify the input type and expected data format.
+3. Generate a label that is:
+    - Clear and descriptive (e.g., "Email address", "First name", "Password")
+    - Concise but specific enough to avoid ambiguity
+    - Programmatically associated with the input element e.g., via <label for="input-id">
 
 # Guidelines:
-- Labels should be clear and descriptive (e.g., "Email address", "First name", "Password")
-- Consider the input type (e.g., text input, select, date, number, name, email, password, etc.) to generate appropriate labels
-  - If the input type is "select", make sure to look at the options in the dropdown list and generate a helpful label for the dropdown.
+- Avoid vague labels like “Name” when more detail helps (e.g., “First and Last Name”).
+- Keep labels succinct but meaningful to guide all users.
+- Ensure labels reflect the expected input type and any important constraints if appropriate.
 
-# Here is the input field context:
-${inputContext}
+# Form field input types to consider:
+- Text inputs (name, address, etc.)
+- Email inputs
+- Password inputs
+- Phone number inputs
+- Date inputs
+- Select inputs
+- Select dropdowns
 
 # Examples of good vs bad labels:
 - Name (First and Last): Specifies that both first and last names are expected, avoiding ambiguity.
@@ -268,6 +263,9 @@ ${inputContext}
 - Shipping Address: Clearly identifies the purpose of the input.
 - Search: Simple and clear for a search input.
 - Select your country: Specifies that the field is a dropdown list of countries instead of just saying "select option"
+
+# Here is the input field context:
+${inputContext}
 `;
 
     const response = await fetch('http://localhost:1234/v1/chat/completions', {
@@ -322,12 +320,8 @@ ${inputContext}
                   type: "string",
                   description: "Clear, concise label for the field"
                 },
-                aria_label: {
-                  type: "string",
-                  description: "ARIA label for screen readers (can be same as label)"
-                }
               },
-              required: ["field_purpose", "input_type", "label", "aria_label"]
+              required: ["field_purpose", "input_type", "label"]
             }
           }
         },
@@ -342,6 +336,7 @@ ${inputContext}
     }
     
     const result = await response.json();
+    console.log("Form field label generation result:", result.choices[0].message.parsed);
     return JSON.parse(result.choices[0].message.content);
     
   } catch (error) {
@@ -365,37 +360,46 @@ async function analyzeFormFieldAccessibility(inputElement) {
     const currentAriaLabel = inputElement.getAttribute('aria-label') || '';
     const currentHelpText = getCurrentHelpText(inputElement);
     
-    const analysisPrompt = `You are a web accessibility expert analyzing the accessibility quality of a form input field.
+    const analysisPrompt = `You are a web accessibility expert tasked with evaluating the accessibility and effectiveness of labels for form inputs.
 
 # You will receive:
-- Page and form context
-- Input field details  
+- Form context
+- Input field details(visible text label, ARIA label, input type, required)
 - Current accessibility features
 - Input field screenshot (isolated)
 - Input field with surrounding context screenshot
 
-Your task is to evaluate how accessible this form field is for users with disabilities, particularly screen reader users.
+# Why evaluate labels:
+- Labels are critical for helping all users, especially screen reader users, understand what information is expected in each form field.
+- Properly associated, clear, and descriptive labels improve usability and reduce user errors.
+- Evaluating labels ensures they meet accessibility best practices and WCAG requirements.
 
-# Analysis Steps:
-1. Evaluate the current labeling (visible labels, aria-label, etc.)
-2. Assess placeholder text quality and appropriateness
-3. Check for helpful guidance or error prevention
-4. Consider keyboard accessibility and field identification
-5. Rate overall accessibility and identify improvements
+# Your evaluation steps:
+1. Review the form context and surrounding UI to understand the input’s intended purpose.
+2. Examine the existing label text for clarity, descriptiveness, and conciseness.
+3. Verify that the label is programmatically associated with the input element (e.g., using <label for="input-id">)
+4. Check for ambiguity or vagueness in the label that might confuse users.
+5. Identify if the label sufficiently conveys input expectations, including any important constraints or format hints.
+6. Provide recommendations (if applicable) for improving the label clarity, accessibility and compliance with best practices.
 
-# Accessibility Criteria:
-- Clear, descriptive labeling that explains the field's purpose
-- Appropriate use of placeholders (examples, not labels)
-- Helpful guidance for complex fields
-- Proper ARIA attributes for screen readers
-- Clear error handling and validation messaging
-- Logical tab order and keyboard navigation
+# Guidelines for evaluation:
+- Labels should be specific and meaningful (e.g., "Email address" instead of "Email")
+- Avoid labels that rely solely on placeholders or visual cues
+- Labels must remain visible and programmatically linked to inputs
+- Consider the input type to ensure the label matches the expected data format
 
-Current Field State:
-- Label: "${currentLabel}"
-- Placeholder: "${currentPlaceholder}"
+# Form field input types to consider:
+- Text inputs (name, address, etc.)
+- Email inputs
+- Password inputs
+- Phone number inputs
+- Date inputs
+- Select inputs
+- Select dropdowns
+
+#Current Field State:
+- Visible Text Label: "${currentLabel}"
 - ARIA Label: "${currentAriaLabel}"
-- Help Text: "${currentHelpText}"
 - Input Type: ${inputElement.type}
 - Required: ${inputElement.required}`;
 
@@ -414,7 +418,7 @@ Current Field State:
             content: [
               {
                 type: "text",
-                text: `${analysisPrompt}\n\nPage Context: ${pageContext}\nForm Context: ${formContext}\nInput Context: ${inputContext}`
+                text: `${analysisPrompt}\n\nForm Context: ${formContext}\nInput Context: ${inputContext}`
               },
               {
                 type: "image_url",
@@ -439,17 +443,13 @@ Current Field State:
             schema: {
               type: "object",
               properties: {
-                accessibility_score: {
-                  type: "number",
-                  description: "Integer score from 1-10 for overall accessibility"
+                field_purpose: {
+                  type: "string",
+                  description: "Based on the context analysis, what is the purpose of this field?"
                 },
                 label_quality: {
                   type: "string",
-                  enum: ["excellent", "good", "fair", "poor", "missing"]
-                },
-                placeholder_appropriateness: {
-                  type: "string",
-                  enum: ["excellent", "good", "fair", "poor", "not_applicable"]
+                  description: "Evaluation of the label's clarity, descriptiveness, and conciseness"
                 },
                 issues_found: {
                   type: "array",
@@ -465,16 +465,8 @@ Current Field State:
                   },
                   description: "Specific suggestions for improvement"
                 },
-                is_accessible: {
-                  type: "boolean",
-                  description: "Whether the field meets basic accessibility standards"
-                },
-                reasoning: {
-                  type: "string",
-                  description: "Explanation of the accessibility assessment"
-                }
               },
-              required: ["accessibility_score", "label_quality", "placeholder_appropriateness", "issues_found", "suggestions", "is_accessible", "reasoning"]
+              required: ["field_purpose", "label_quality", "issues_found", "suggestions"]
             }
           }
         },
@@ -702,11 +694,6 @@ function displayFormAccessibilityAnalysis(inputElement, analysis) {
   const currentLabel = getCurrentLabel(inputElement);
   const currentPlaceholder = inputElement.placeholder || '';
   
-  // Color code based on accessibility score
-  let scoreColor = '#dc3545'; // Red for poor
-  if (analysis.accessibility_score >= 8) scoreColor = '#28a745'; // Green for good
-  else if (analysis.accessibility_score >= 5) scoreColor = '#ffc107'; // Yellow for okay
-  
   tooltip.innerHTML = `
     <div style="font-weight: bold; margin-bottom: 8px;">🏷️ Form Field Accessibility Analysis</div>
     
@@ -719,12 +706,17 @@ function displayFormAccessibilityAnalysis(inputElement, analysis) {
     </div>
     
     <div style="margin-bottom: 8px;">
-      <span style="color: ${scoreColor}; font-weight: bold;">Score: ${analysis.accessibility_score}/10</span>
       <span style="margin-left: 10px; font-size: 10px;">
-        ${analysis.is_accessible ? "✅ Accessible" : "❌ Needs work"}
+        ${analysis.field_purpose}
       </span>
     </div>
     
+    <div style="margin-bottom: 8px;">
+    <span style="margin-left: 10px; font-size: 10px;">
+      ${analysis.label_quality}
+    </span>
+    </div>
+
     ${analysis.issues_found.length > 0 ? `
       <div style="margin-bottom: 8px;">
         <div style="font-size: 10px; color: #ffc107;">ISSUES:</div>
@@ -742,10 +734,6 @@ function displayFormAccessibilityAnalysis(inputElement, analysis) {
         </ul>
       </div>
     ` : ''}
-    
-    <div style="font-size: 9px; opacity: 0.8; margin-top: 8px;">
-      ${analysis.reasoning}
-    </div>
   `;
   
   tooltip.style.cssText = `
@@ -781,8 +769,6 @@ function displayFormAccessibilityAnalysis(inputElement, analysis) {
   }, 12000);
   
   console.log('Form accessibility analysis:', {
-    score: analysis.accessibility_score,
-    is_accessible: analysis.is_accessible,
     label_quality: analysis.label_quality,
     issues: analysis.issues_found,
     suggestions: analysis.suggestions
@@ -1243,11 +1229,6 @@ function displayAltTextAnalysis(imgElement, analysis) {
   
   const currentAltText = imgElement.getAttribute('alt') || imgElement.getAttribute('aria-label') || '';
   
-  // Color code based on quality score
-  let scoreColor = '#dc3545'; // Red for poor
-  if (analysis.quality_score >= 8) scoreColor = '#28a745'; // Green for good
-  else if (analysis.quality_score >= 5) scoreColor = '#ffc107'; // Yellow for okay
-  
   tooltip.innerHTML = `
     <div style="font-weight: bold; margin-bottom: 8px;">🔍 Alt Text Quality Analysis</div>
     
@@ -1259,9 +1240,9 @@ function displayAltTextAnalysis(imgElement, analysis) {
     </div>
     
     <div style="margin-bottom: 8px;">
-      <span style="color: ${scoreColor}; font-weight: bold;">Score: ${analysis.is_sufficient ? "✅" : "❌"}</span>
-      <span style="margin-left: 10px; font-size: 10px;">
-        ${analysis.classification}
+        <span style="font-weight: bold;">${analysis.is_sufficient ? "✅" : "❌"}</span>
+        <span style="margin-left: 10px; font-size: 10px;">
+          ${analysis.classification}
       </span>
     </div>
     
@@ -2401,10 +2382,6 @@ async function highlightLinks() {
         addGeneratedLinkText(link, result.suggested_text);
       }
       
-      if (result.aria_label && !link.getAttribute('aria-label')) {
-        link.setAttribute('aria-label', result.aria_label);
-      }
-      
       link.style.outline = "3px solid green";
       updateLoadingIndicator(loadingDiv, '✅ Link text improved', 'rgba(0,128,0,0.8)');
       
@@ -2429,14 +2406,9 @@ async function highlightLinks() {
   });
   
   // Wait for all generation to complete
-  const generationResults = await Promise.all(generationPromises);
+  await Promise.all(generationPromises);
   console.log('Link text generation completed');
   
-  // STEP 2: Now analyze ALL links (including newly improved ones) for quality
-  // Wait a bit for the DOM to settle after text generation
-  setTimeout(async () => {
-    await analyzeAllLinks();
-  }, 1000);
 }
 
 function needsBetterLinkText(link) {
@@ -2631,7 +2603,41 @@ ${destinationInfo}
     }
     
     const result = await response.json();
-    return JSON.parse(result.choices[0].message.content);
+    
+    // Get the content from the AI response
+    const content = result.choices[0].message.content;
+    
+    
+    // Try to clean and parse the JSON
+    let cleanedContent = content;
+    
+    // Sometimes AI adds markdown code blocks, remove them
+    if (content.includes('```json')) {
+      cleanedContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    }
+    
+    // Remove any leading/trailing whitespace
+    cleanedContent = cleanedContent.trim();
+    
+    // Try to parse the JSON with better error handling
+    try {
+      return JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('JSON Parse Error Details:', {
+        originalContent: content,
+        cleanedContent: cleanedContent,
+        error: parseError.message
+      });
+      
+      // Return a fallback response instead of crashing
+      return {
+        current_text_analysis: "Unable to analyze due to parsing error",
+        link_purpose: "Unknown",
+        suggested_text: linkElement.textContent || "Link",
+        aria_label: linkElement.textContent || "Link",
+        improvement_reasoning: "Fallback due to AI response parsing error"
+      };
+    }
     
   } catch (error) {
     console.error('Link text generation error:', error);
@@ -2783,11 +2789,6 @@ function displayLinkAccessibilityAnalysis(linkElement, analysis) {
   const currentText = getLinkText(linkElement);
   const originalText = linkElement.getAttribute('data-original-text') || currentText;
   
-  // Color code based on accessibility score
-  let scoreColor = '#dc3545'; // Red for poor
-  if (analysis.accessibility_score >= 8) scoreColor = '#28a745'; // Green for good
-  else if (analysis.accessibility_score >= 5) scoreColor = '#ffc107'; // Yellow for okay
-  
   tooltip.innerHTML = `
     <div style="font-weight: bold; margin-bottom: 8px;">🔗 Link Accessibility Analysis</div>
     
@@ -2800,16 +2801,15 @@ function displayLinkAccessibilityAnalysis(linkElement, analysis) {
     </div>
     
     <div style="margin-bottom: 8px;">
-      <span style="color: ${scoreColor}; font-weight: bold;">Score: ${analysis.accessibility_score}/10</span>
       <span style="margin-left: 10px; font-size: 10px;">
-        ${analysis.is_accessible ? "✅ Accessible" : "❌ Needs work"}
+        ${analysis.label_quality}
       </span>
     </div>
     
     <div style="margin-bottom: 8px;">
       <div style="font-size: 10px; color: #17a2b8;">CLARITY:</div>
       <div style="font-size: 10px;">
-        Text: ${analysis.text_clarity} | Purpose: ${analysis.purpose_clarity}
+        Text: ${analysis.label_quality}
       </div>
     </div>
     
@@ -2832,7 +2832,7 @@ function displayLinkAccessibilityAnalysis(linkElement, analysis) {
     ` : ''}
     
     <div style="font-size: 9px; opacity: 0.8; margin-top: 8px;">
-      ${analysis.reasoning}
+      ${analysis.label_quality}
     </div>
   `;
   
@@ -2870,10 +2870,7 @@ function displayLinkAccessibilityAnalysis(linkElement, analysis) {
   
   console.log('Link accessibility analysis:', {
     current_text: currentText,
-    score: analysis.accessibility_score,
-    is_accessible: analysis.is_accessible,
-    text_clarity: analysis.text_clarity,
-    purpose_clarity: analysis.purpose_clarity,
+    label_quality: analysis.label_quality,
     issues: analysis.issues_found,
     suggestions: analysis.suggestions
   });
