@@ -83,10 +83,10 @@ The extension uses a two-phase approach for each accessibility category:
 ## 🛠️ **Technical Details**
 ### **Architecture**
 Extension Structure:
-├── Content Script (main logic)
-├── Background Script (Chrome APIs)
-├── Popup Interface (user controls)
-└── AI Integration (LM Studio API)
+- Content Script (main logic)
+- Background Script (Chrome APIs)
+- Popup Interface (user controls)
+- AI Integration (LM Studio API)
 
 ### **API Integration**
 ```js
