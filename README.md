@@ -50,7 +50,7 @@ The extension uses a two-phase approach for each accessibility category:
 2. Install Extension 
     - Clone or download extension files
     - Open Chrome -> Extensions -> Developer Mode
-    - Load unpacked extension from folder `browser-ext`
+    - Load unpacked extension from folder `browser-ext/dist`
 3. Verify Setup
     - Extension icon appears in Chrome toolbar (can be enabled/disabled)
     - LM Studio running on `http://localhost:1234`
