@@ -58,7 +58,7 @@ The extension uses a two-phase approach for each accessibility category:
 
 ## 📱 **Usage**
 ### **Basic Operation**
-1. Navigate to any webpage
+1. Navigate to any webpage (you can use the `browser-ext/test.html` for testing)
 2. Click the extension icon to toggle ON/OFF
 3. Watch as the extension automatically:
     - Highlights problematic elements with colored outlines
